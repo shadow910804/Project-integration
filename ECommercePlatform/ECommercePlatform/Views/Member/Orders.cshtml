@@ -1,0 +1,29 @@
+@model IEnumerable<ECommercePlatform.Models.Order>
+
+<h2>我的訂單</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>訂單編號</th>
+            <th>總金額</th>
+            <th>付款方式</th>
+            <th>狀態</th>
+            <th>下單時間</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var o in Model)
+    {
+        <tr>
+            <td>@o.Id</td>
+            <td>@o.TotalAmount.ToString("C")</td>
+            <td>@o.PaymentMethod</td>
+            <td>@o.OrderStatus</td>
+            <td>@o.OrderDate.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+            <td><a class="btn btn-sm btn-primary" href="/Member/Orders/@o.Id">查看</a></td>
+        </tr>
+    }
+    </tbody>
+</table>

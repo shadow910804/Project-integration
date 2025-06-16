@@ -1,0 +1,11 @@
+@model ECommercePlatform.Models.Order
+
+<h2>訂單已成立</h2>
+
+<p>訂單編號：<strong>@Model.Id</strong></p>
+<p>總金額：<strong>@Model.TotalAmount.ToString("C")</strong></p>
+<p>狀態：@Model.OrderStatus</p>
+<p>付款方式：@Model.PaymentMethod</p>
+<p>收件地址：@Model.ShippingAddress</p>
+
+<a href="/Member/Orders" class="btn btn-primary mt-3">查看我的訂單</a>

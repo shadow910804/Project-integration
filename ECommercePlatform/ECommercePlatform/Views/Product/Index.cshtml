@@ -1,0 +1,33 @@
+@model ECommercePlatform.Models.ViewModels.PagedResult<ECommercePlatform.Models.Product>
+
+<h1>商品列表</h1>
+
+<div class="row">
+    @foreach (var product in Model.Items)
+    {
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name">
+                <div class="card-body">
+                    <h5 class="card-title">@product.Name</h5>
+                    <p class="card-text">價格: $@product.Price</p>
+                    <a asp-controller="Product" asp-action="Details" asp-route-id="@product.Id" class="btn btn-primary">查看詳情</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@{
+    var routeValues = new Dictionary<string, object>
+    {
+        ["sort"] = ViewBag.Sort,
+        ["keyword"] = ViewBag.Keyword,
+        ["minPrice"] = ViewBag.MinPrice,
+        ["maxPrice"] = ViewBag.MaxPrice,
+        ["onSale"] = ViewBag.OnSale
+    };
+    ViewBag.RouteValues = routeValues;
+}
+
+<partial name="_Pagination" model="Model" />

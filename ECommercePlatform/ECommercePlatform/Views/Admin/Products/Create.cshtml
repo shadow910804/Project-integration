@@ -1,0 +1,290 @@
+@model ECommercePlatform.Models.ViewModels.ProductUploadDto
+
+@{
+    ViewData["Title"] = "建立商品";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/admin/dashboard">管理後台</a></li>
+                    <li class="breadcrumb-item"><a asp-action="AdminIndex">商品管理</a></li>
+                    <li class="breadcrumb-item active">建立商品</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">🆕 建立新商品</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="AdminCreate" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+
+                        <!-- 基本資訊 -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <h5 class="text-primary">📝 基本資訊</h5>
+                                <hr>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label asp-for="Name" class="form-label">商品名稱 <span class="text-danger">*</span></label>
+                                <input asp-for="Name" class="form-control" placeholder="請輸入商品名稱" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="Price" class="form-label">售價 <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">NT$</span>
+                                    <input asp-for="Price" class="form-control" placeholder="0" />
+                                </div>
+                                <span asp-validation-for="Price" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label">商品描述</label>
+                            <textarea asp-for="Description" class="form-control" rows="4"
+                                      placeholder="請詳細描述商品特色、規格、使用方法等..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <!-- 庫存管理 -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <h5 class="text-primary">📦 庫存管理</h5>
+                                <hr>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="Stock" class="form-label">初始庫存數量</label>
+                                <input asp-for="Stock" class="form-control" type="number" min="0" placeholder="100" />
+                                <div class="form-text">設定商品的初始庫存數量</div>
+                                <span asp-validation-for="Stock" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- 折扣設定 -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <h5 class="text-primary">💰 折扣設定（可選）</h5>
+                                <hr>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label asp-for="DiscountPrice" class="form-label">折扣價</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">NT$</span>
+                                    <input asp-for="DiscountPrice" class="form-control" placeholder="選填" />
+                                </div>
+                                <span asp-validation-for="DiscountPrice" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="DiscountStart" class="form-label">折扣開始時間</label>
+                                <input asp-for="DiscountStart" type="datetime-local" class="form-control" />
+                                <span asp-validation-for="DiscountStart" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="DiscountEnd" class="form-label">折扣結束時間</label>
+                                <input asp-for="DiscountEnd" type="datetime-local" class="form-control" />
+                                <span asp-validation-for="DiscountEnd" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- 商品圖片 -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary">🖼️ 商品圖片</h5>
+                                <hr>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="ImageFile" class="form-label">上傳圖片檔案</label>
+                                <input asp-for="ImageFile" type="file" class="form-control" accept="image/*" />
+                                <div class="form-text">支援 JPG、PNG、GIF、WebP 格式，檔案大小不超過 5MB</div>
+                                <span asp-validation-for="ImageFile" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="ImageUrl" class="form-label">或填入圖片網址</label>
+                                <input asp-for="ImageUrl" class="form-control" placeholder="https://example.com/image.jpg" />
+                                <div class="form-text">如果沒有上傳檔案，可以填入外部圖片連結</div>
+                                <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- 圖片預覽 -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div id="image-preview" style="display: none;">
+                                    <label class="form-label">圖片預覽</label>
+                                    <div>
+                                        <img id="preview-img" src="" alt="圖片預覽" class="img-thumbnail" style="max-width: 200px; max-height: 200px;" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 提交按鈕 -->
+                        <div class="row">
+                            <div class="col-12">
+                                <hr>
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> 建立商品
+                                    </button>
+                                    <a asp-action="AdminIndex" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left"></i> 返回列表
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右側說明 -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">📋 填寫說明</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="text-primary">必填項目</h6>
+                        <ul class="small">
+                            <li>商品名稱：清楚描述商品特色</li>
+                            <li>售價：請填入正確的銷售價格</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6 class="text-success">建議填寫</h6>
+                        <ul class="small">
+                            <li>商品描述：詳細說明提高轉換率</li>
+                            <li>庫存數量：有助於庫存管理</li>
+                            <li>商品圖片：提升視覺吸引力</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6 class="text-warning">折扣設定</h6>
+                        <ul class="small">
+                            <li>可設定限時特價優惠</li>
+                            <li>折扣價需低於原價</li>
+                            <li>需設定有效期間</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">🔍 預覽效果</h6>
+                </div>
+                <div class="card-body">
+                    <div class="product-preview">
+                        <div class="preview-image bg-light d-flex align-items-center justify-content-center"
+                             style="height: 150px; border: 1px dashed #ccc;">
+                            <span class="text-muted">商品圖片預覽</span>
+                        </div>
+                        <div class="mt-2">
+                            <h6 class="preview-name text-muted">商品名稱會顯示在這裡</h6>
+                            <p class="preview-price text-primary mb-0">
+                                <strong>NT$ 0</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            // 圖片上傳預覽
+            $('#ImageFile').change(function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#preview-img').attr('src', e.target.result);
+                        $('#image-preview').show();
+                        $('.preview-image').html(`<img src="${e.target.result}" style="max-width: 100%; max-height: 150px;">`);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // 圖片網址預覽
+            $('#ImageUrl').blur(function() {
+                const url = $(this).val();
+                if (url) {
+                    $('#preview-img').attr('src', url);
+                    $('#image-preview').show();
+                    $('.preview-image').html(`<img src="${url}" style="max-width: 100%; max-height: 150px;" onerror="this.parentElement.innerHTML='<span class=\\'text-danger\\'>圖片載入失敗</span>'">`);
+                }
+            });
+
+            // 即時預覽商品名稱
+            $('#Name').on('input', function() {
+                const name = $(this).val() || '商品名稱會顯示在這裡';
+                $('.preview-name').text(name);
+            });
+
+            // 即時預覽價格
+            $('#Price').on('input', function() {
+                const price = $(this).val() || '0';
+                $('.preview-price').html(`<strong>NT$ ${parseFloat(price).toLocaleString()}</strong>`);
+            });
+
+            // 折扣價格驗證
+            $('#DiscountPrice').on('input', function() {
+                const originalPrice = parseFloat($('#Price').val()) || 0;
+                const discountPrice = parseFloat($(this).val()) || 0;
+
+                if (discountPrice > 0 && discountPrice >= originalPrice) {
+                    $(this).addClass('is-invalid');
+                    $(this).next('.text-danger').text('折扣價必須低於原價');
+                } else {
+                    $(this).removeClass('is-invalid');
+                    $(this).next('.text-danger').text('');
+                }
+            });
+
+            // 表單提交驗證
+            $('form').submit(function(e) {
+                const originalPrice = parseFloat($('#Price').val()) || 0;
+                const discountPrice = parseFloat($('#DiscountPrice').val()) || 0;
+
+                if (discountPrice > 0 && discountPrice >= originalPrice) {
+                    e.preventDefault();
+                    alert('折扣價必須低於原價！');
+                    $('#DiscountPrice').focus();
+                    return false;
+                }
+            });
+        });
+    </script>
+}

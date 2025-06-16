@@ -1,0 +1,45 @@
+@model ECommercePlatform.Models.ViewModels.PagedResult<ECommercePlatform.Models.User>
+
+@{
+    var keyword = ViewContext.HttpContext.Request.Query["keyword"].ToString();
+}
+<h2>會員列表</h2>
+<form method="get" class="form-inline mb-3">
+    <input type="text" name="keyword" value="@ViewContext.HttpContext.Request.Query["keyword"]" class="form-control mr-2" placeholder="搜尋姓名或Email..." />
+    <button type="submit" class="btn btn-info">搜尋</button>
+    <a class="btn btn-secondary ml-2" href="/admin/users">清除</a>
+</form>
+
+<a class="btn btn-primary mb-2" href="/admin/users/create">新增會員</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>姓名</th>
+            <th>Email</th>
+            <th>註冊時間</th>
+            <th>狀態</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model.Items)
+        {
+            <tr>
+                <td>@user.Username</td>
+                <td>@user.Email</td>
+                <td>@user.CreatedAt.ToString("yyyy-MM-dd")</td>
+                <td>@(user.IsActive ? "啟用" : "停用")</td>
+                <td>
+                    <a class="btn btn-sm btn-warning" href="/admin/users/edit/@user.Id">編輯</a>
+                    <a class="btn btn-sm btn-danger" href="/admin/users/delete/@user.Id" onclick="return confirm('確定要刪除嗎?')">刪除</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@{
+    ViewBag.RouteValues = new Dictionary<string, object>{ ["keyword"] = keyword };
+}
+<partial name="_Pagination" model="Model" />

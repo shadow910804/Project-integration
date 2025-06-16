@@ -1,0 +1,76 @@
+@{
+    ViewData["Title"] = "註冊新帳號";
+}
+@model ECommercePlatform.Models.RegisterViewModel
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card mt-5">
+                <div class="card-header">
+                    <h2 class="mb-0 text-center">📝 註冊新帳號</h2>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-info">@ViewBag.Message</div>
+                    }
+
+                    <form method="post" asp-controller="Account" asp-action="Register">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            <label class="form-label">您的姓氏：<span class="text-danger">*</span></label>
+                            @Html.TextBoxFor(m => m.LastName, new { @class = "form-control", placeholder = "請輸入姓氏", name = "LastName" })
+                            <span style="color: #C83C23;">@Html.ValidationMessageFor(model => model.LastName)</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">您的名字：<span class="text-danger">*</span></label>
+                            @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control", placeholder = "請輸入名字", name = "FirstName" })
+                            <span style="color: #C83C23;">@Html.ValidationMessageFor(model => model.FirstName)</span>
+                        </div>
+
+                        
+                        <div class="mb-3">
+                            <label class="form-label">用戶名：<span class="text-danger">*</span></label>
+                            @Html.TextBoxFor(m => m.Username, new { @class = "form-control", placeholder = "請輸入用戶名", name = "Username" })
+                            <div class="form-text">用戶名將用於登入和顯示</div>
+                            <span style="color: #C83C23;">@Html.ValidationMessageFor(model => model.Username)</span>
+                        </div>
+                        
+
+                        <div class="mb-3">
+                            <label class="form-label">Email：<span class="text-danger">*</span></label>
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "請輸入 Email", name = "Email", type = "email" })
+                            <div class="form-text">Email 將用於找回密碼和接收通知</div>
+                            <span style="color: #C83C23;">@Html.ValidationMessageFor(model => model.Email)</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">密碼：<span class="text-danger">*</span></label>
+                            <input type="password" name="Password" class="form-control" placeholder="請輸入密碼"  />
+                            <div class="form-text">密碼至少 6 個字元</div>
+                            <span style="color: #C83C23;">@Html.ValidationMessageFor(model => model.Password)</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">確認密碼：<span class="text-danger">*</span></label>
+                            <input type="password" name="ConfirmPassword" class="form-control" placeholder="請再次輸入密碼" />
+                            <span style="color: #C83C23;">@Html.ValidationMessageFor(model => model.ConfirmPassword)</span>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100">註冊</button>
+                    </form>
+
+                    <hr />
+
+                    <div class="text-center">
+                        <p>已有帳號？ <a asp-controller="Account" asp-action="Login">立即登入</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,228 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ECommercePlatform</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/ECommercePlatform.styles.css" asp-append-version="true" />
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">🛒Ez購,Ez Life</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">🏠 首頁</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Product" asp-action="Index">📱 所有商品</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Review" asp-action="Index">💬 商品評價</a>
+                        </li>
+                    </ul>
+
+                    <!-- 右側選單 -->
+                    <ul class="navbar-nav">
+                        <!-- 購物車圖示 -->
+                        <li class="nav-item">
+                            @if (User.Identity != null && User.Identity.IsAuthenticated)
+                            {
+                                <a class="nav-link text-dark position-relative" asp-controller="Cart" asp-action="Index">
+                                    🛒 購物車
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                          id="cart-count" style="font-size: 0.6em; display: none;">
+                                        0
+                                    </span>
+                                </a>
+                            }
+                            else
+                            {
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">
+                                    🛒 購物車
+                                </a>
+                            }
+                        </li>
+
+                        @{
+                            var userRole = User.Claims.FirstOrDefault(c => c.Type == "UserRole")?.Value;
+                        }
+
+                        <!-- 會員功能 -->
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">
+                                    👤 @User.Identity.Name
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="Member" asp-action="Index">會員資料</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Order" asp-action="MyOrders">我的訂單</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                            <button type="submit" class="dropdown-item">登出</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <!-- 管理功能 (如果是管理員或工程師) -->
+                            @if (userRole == "Admin" || userRole == "Engineer")
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown">
+                                        ⚙️ 管理
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="/admin/products">🛍️ 商品管理</a></li>
+                                        <li><a class="dropdown-item" href="/admin/orders">📦 訂單管理</a></li>
+                                        <li><a class="dropdown-item" href="/admin/users">👥 用戶管理</a></li>
+                                        <li><a class="dropdown-item" href="/admin/dashboard">📊 後台總覽</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Statistics" asp-action="Index">📈 統計報表</a></li>
+                                    </ul>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">🔑 登入/註冊</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2025 - ECommercePlatform - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <!-- 購物車數量更新 -->
+    <script>
+        // 更新購物車數量
+        function updateCartCount() {
+        @if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            <text>
+                    fetch('/Cart/GetCartCount')
+                        .then(response => response.json())
+                        .then(data => {
+                            const cartBadge = document.getElementById('cart-count');
+                            if (cartBadge) {
+                                cartBadge.textContent = data.count || 0;
+                                cartBadge.style.display = (data.count > 0) ? 'inline' : 'none';
+                            }
+                        })
+                        .catch(err => console.log('無法更新購物車數量:', err));
+            </text>
+        }
+        }
+
+        // 頁面載入時更新購物車數量
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartCount();
+        });
+
+        // 全域函數：加入購物車後更新數量
+        window.refreshCartCount = updateCartCount;
+    </script>
+
+    <!-- SignalR 通知 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/hub/notify")
+            .build();
+
+        connection.on("ReceiveMessage", message => {
+            showNotification("📢 系統通知：" + message, "info");
+        });
+
+        connection.start().catch(err => console.error('SignalR 連接失敗:', err));
+
+        // 通知顯示函數
+        function showNotification(message, type = 'info') {
+            const alertClass = type === 'success' ? 'alert-success' :
+                              type === 'warning' ? 'alert-warning' :
+                              type === 'error' ? 'alert-danger' : 'alert-info';
+
+            const alert = document.createElement('div');
+            alert.className = `alert ${alertClass} alert-dismissible position-fixed`;
+            alert.style.cssText = 'top: 20px; right: 20px; z-index: 10000; min-width: 300px; max-width: 400px;';
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            document.body.appendChild(alert);
+
+            // 5秒後自動消失
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.parentNode.removeChild(alert);
+                }
+            }, 5000);
+        }
+
+        // 將通知函數設為全域
+        window.showNotification = showNotification;
+    </script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+          apiKey: "YOUR_FIREBASE_API_KEY",
+          authDomain: "YOUR_FIREBASE_PROJECT.firebaseapp.com",
+          projectId: "YOUR_FIREBASE_PROJECT",
+          messagingSenderId: "YOUR_SENDER_ID",
+          appId: "YOUR_APP_ID"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const messaging = firebase.messaging();
+
+        messaging
+          .requestPermission()
+          .then(() => messaging.getToken())
+          .then(token => {
+            console.log("FCM Token:", token);
+            return fetch("/api/device/register", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ token })
+            });
+          })
+          .catch(err => {
+            console.warn("推播權限被拒絕", err);
+          });
+    </script>
+</body>
+</html>

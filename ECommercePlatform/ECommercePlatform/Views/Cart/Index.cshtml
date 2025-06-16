@@ -1,0 +1,531 @@
+@model ECommercePlatform.Models.ViewModels.CartItemListViewModel
+
+@{
+    ViewData["Title"] = "購物車";
+
+    // 計算總金額時考慮折扣價
+    decimal CalculateItemPrice(ECommercePlatform.Models.Product product)
+    {
+        // 檢查是否在折扣期間
+        if (product.DiscountPrice.HasValue &&
+            product.DiscountStart.HasValue && product.DiscountEnd.HasValue &&
+            DateTime.Now >= product.DiscountStart.Value &&
+            DateTime.Now <= product.DiscountEnd.Value)
+        {
+            return product.DiscountPrice.Value;
+        }
+        return product.Price;
+    }
+    var totalAmount = Model.CartItem?.Sum(item => item.Quantity * CalculateItemPrice(item.Product)) ?? 0;
+    var totalItems = Model.CartItem?.Sum(item => item.Quantity) ?? 0;
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">首頁</a></li>
+                    <li class="breadcrumb-item active">購物車</li>
+                </ol>
+            </nav>
+
+            <h1 class="mb-4">🛒 購物車</h1>
+        </div>
+    </div>
+
+    @if (Model.CartItem != null && Model.CartItem.Any())
+    {
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">購物清單 (@totalItems 件商品)</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        @foreach (var item in Model.CartItem)
+                        {
+                            var currentPrice = CalculateItemPrice(item.Product);
+                            var hasDiscount = item.Product.DiscountPrice.HasValue &&
+                            item.Product.DiscountStart.HasValue && item.Product.DiscountEnd.HasValue &&
+                            DateTime.Now >= item.Product.DiscountStart.Value &&
+                            DateTime.Now <= item.Product.DiscountEnd.Value &&
+                            item.Product.DiscountPrice < item.Product.Price;
+
+                            <div class="cart-item p-3 border-bottom" data-cart-id="@item.Id">
+                                <div class="row align-items-center">
+                                    <!-- 商品圖片 -->
+                                    <div class="col-md-2 text-center">
+                                        @if (!string.IsNullOrEmpty(item.Product.ImageUrl))
+                                        {
+                                            <img src="@item.Product.ImageUrl" alt="@item.Product.Name"
+                                                 class="img-fluid rounded" style="max-height: 80px;">
+                                        }
+                                        else
+                                        {
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center"
+                                                 style="width: 80px; height: 80px; margin: 0 auto;">
+                                                <span style="font-size: 2rem;">📱</span>
+                                            </div>
+                                        }
+                                    </div>
+
+                                    <!-- 商品資訊 -->
+                                    <div class="col-md-4">
+                                        <h6 class="mb-1">
+                                            <a asp-controller="Product" asp-action="Details" asp-route-id="@item.Product.Id"
+                                               class="text-decoration-none">
+                                                @item.Product.Name
+                                            </a>
+                                        </h6>
+                                        <small class="text-muted">@item.Product.Description</small>
+
+                                        <!-- 折扣提醒 -->
+                                        @if (hasDiscount)
+                                        {
+                                            var discountPercent = Math.Round((1 - (item.Product.DiscountPrice!.Value / item.Product.Price)) * 100);
+                                            <div class="text-success small mt-1">
+                                                <i class="fas fa-tag"></i> 限時特價 -@discountPercent%
+                                            </div>
+                                        }
+
+                                        <!-- 商品狀態 -->
+                                        @if (!item.Product.IsActive)
+                                        {
+                                            <div class="text-danger small mt-1">
+                                                <i class="fas fa-exclamation-triangle"></i> 商品已下架
+                                            </div>
+                                        }
+
+                                        <!-- 庫存提醒（如果有Stock屬性） -->
+                                        @try
+                                        {
+                                            var stockValue = (int?)item.Product.GetType().GetProperty("Stock")?.GetValue(item.Product);
+                                            if (stockValue.HasValue && stockValue <= 5 && stockValue > 0)
+                                            {
+                                                <div class="text-warning small mt-1">
+                                                    <i class="fas fa-exclamation-triangle"></i> 僅剩 @stockValue 件
+                                                </div>
+                                            }
+                                        }
+                                        catch
+                                        {
+                                            <!-- 忽略庫存檢查 -->
+                                        }
+                                    </div>
+
+                                    <!-- 單價 -->
+                                    <div class="col-md-2 text-center">
+                                        @if (hasDiscount)
+                                        {
+                                            <div class="fw-bold text-danger">$@currentPrice.ToString("N0")</div>
+                                            <small class="text-muted">
+                                                <del>$@item.Product.Price.ToString("N0")</del>
+                                            </small>
+                                        }
+                                        else
+                                        {
+                                            <div class="fw-bold">$@currentPrice.ToString("N0")</div>
+                                        }
+                                    </div>
+
+                                    <!-- 數量控制 -->
+                                    <div class="col-md-2">
+                                        @if (item.Product.IsActive)
+                                        {
+                                            @try
+                                            {
+                                                var stockValue = (int?)item.Product.GetType().GetProperty("Stock")?.GetValue(item.Product);
+                                                var maxQuantity = stockValue ?? 999; // 如果沒有庫存限制，預設999
+
+                                                <div class="input-group">
+                                                    <button class="btn btn-outline-secondary btn-sm quantity-btn"
+                                                            data-action="decrease" data-cart-id="@item.Id">
+                                                        -
+                                                    </button>
+                                                    <input type="number" class="form-control form-control-sm text-center quantity-input"
+                                                           value="@item.Quantity" min="1" max="@maxQuantity"
+                                                           data-cart-id="@item.Id" data-price="@currentPrice"
+                                                           style="max-width: 70px;">
+                                                    <button class="btn btn-outline-secondary btn-sm quantity-btn"
+                                                            data-action="increase" data-cart-id="@item.Id">
+                                                        +
+                                                    </button>
+                                                </div>
+                                            }
+                                            catch
+                                            {
+                                                <!-- 如果沒有Stock屬性，不限制最大數量 -->
+                                                <div class="input-group">
+                                                    <button class="btn btn-outline-secondary btn-sm quantity-btn"
+                                                            data-action="decrease" data-cart-id="@item.Id">
+                                                        -
+                                                    </button>
+                                                    <input type="number" class="form-control form-control-sm text-center quantity-input"
+                                                           value="@item.Quantity" min="1"
+                                                           data-cart-id="@item.Id" data-price="@currentPrice"
+                                                           style="max-width: 70px;">
+                                                    <button class="btn btn-outline-secondary btn-sm quantity-btn"
+                                                            data-action="increase" data-cart-id="@item.Id">
+                                                        +
+                                                    </button>
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="text-center">
+                                                <span class="badge bg-secondary">@item.Quantity</span>
+                                            </div>
+                                        }
+                                    </div>
+
+                                    <!-- 小計和移除 -->
+                                    <div class="col-md-2 text-center">
+                                        <div class="fw-bold text-primary subtotal" data-cart-id="@item.Id">
+                                            $@((item.Quantity * currentPrice).ToString("N0"))
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-danger mt-1 remove-btn"
+                                                data-cart-id="@item.Id">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- 繼續購物 -->
+                <div class="mt-3">
+                    <a asp-controller="Product" asp-action="Index" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left"></i> 繼續購物
+                    </a>
+
+                    <!-- 清空購物車 -->
+                    @if (Model.CartItem.Any() || Model.CartItemWithStatus.Any())
+                    {
+                        <button class="btn btn-outline-secondary ms-2" onclick="clearCart()">
+                            <i class="fas fa-trash"></i> 清空購物車
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <!-- 訂單摘要 -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">訂單摘要</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>商品數量：</span>
+                            <span id="total-items">@totalItems 件</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>商品金額：</span>
+                            <span id="subtotal">$@totalAmount.ToString("N0")</span>
+                        </div>
+
+                        <!-- 折扣優惠 -->
+                        @{
+                            var totalSavings = Model.CartItem.Sum(item =>
+                            {
+                                if (item.Product.DiscountPrice.HasValue &&
+                                item.Product.DiscountStart.HasValue && item.Product.DiscountEnd.HasValue &&
+                                DateTime.Now >= item.Product.DiscountStart.Value &&
+                                DateTime.Now <= item.Product.DiscountEnd.Value &&
+                                item.Product.DiscountPrice < item.Product.Price)
+                                {
+                                    return (item.Product.Price - item.Product.DiscountPrice.Value) * item.Quantity;
+                                }
+                                return 0;
+                            });
+                        }
+
+                        @if (totalSavings > 0)
+                        {
+                            <div class="d-flex justify-content-between mb-2 text-success">
+                                <span>折扣優惠：</span>
+                                <span>-$@totalSavings.ToString("N0")</span>
+                            </div>
+                        }
+
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>運費：</span>
+                            <span id="shipping">
+                                @if (totalAmount >= 1000)
+                                {
+                                    <span class="text-success">免費</span>
+                                }
+                                else
+                                {
+                                    <span>$100</span>
+                                }
+                            </span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between fw-bold fs-5">
+                            <span>總計：</span>
+                            <span id="total-amount" class="text-primary">
+                                $@((totalAmount >= 1000 ? totalAmount : totalAmount + 100).ToString("N0"))
+                            </span>
+                        </div>
+
+                        @if (totalAmount < 1000)
+                        {
+                            <small class="text-info d-block mt-2">
+                                <i class="fas fa-info-circle"></i>
+                                滿 $1,000 享免運費！還差 $@((1000 - totalAmount).ToString("N0"))
+                            </small>
+                        }
+
+                        @if (totalSavings > 0)
+                        {
+                            <small class="text-success d-block mt-1">
+                                <i class="fas fa-gift"></i>
+                                本次購物已為您節省 $@totalSavings.ToString("N0")
+                            </small>
+                        }
+
+                        <!-- 檢查是否有下架商品 -->
+                        @{
+                            var hasInactiveProducts = Model.CartItem.Any(item => !item.Product.IsActive);
+                        }
+
+                        <div class="d-grid gap-2 mt-3">
+                            @if (hasInactiveProducts)
+                            {
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    購物車中有已下架商品，請移除後再結帳
+                                </div>
+                                <button class="btn btn-secondary btn-lg" disabled>
+                                    <i class="fas fa-ban"></i> 無法結帳
+                                </button>
+                            }
+                            else
+                            {
+                                <a asp-controller="Order" asp-action="Checkout" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-credit-card"></i> 前往結帳
+                                </a>
+                            }
+
+                            <button class="btn btn-outline-warning" onclick="saveForLater()">
+                                <i class="fas fa-heart"></i> 儲存為最愛
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 推薦商品 -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">推薦商品</h6>
+                    </div>
+                    <div class="card-body">
+                        <small class="text-muted">根據您的購物車推薦</small>
+                        <div class="mt-2">
+                            <a asp-controller="Product" asp-action="Index" asp-route-sort="recommended"
+                               class="btn btn-sm btn-outline-primary">
+                                查看推薦 →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- 空購物車 -->
+        <div class="row">
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <div class="mb-4" style="font-size: 5rem;">🛒</div>
+                    <h3 class="text-muted mb-3">您的購物車是空的</h3>
+                    <p class="text-muted mb-4">還沒有添加任何商品到購物車</p>
+                    <a asp-controller="Product" asp-action="Index" class="btn btn-primary btn-lg">
+                        <i class="fas fa-shopping-bag"></i> 開始購物
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+
+            // 數量按鈕點擊
+            $('.quantity-btn').click(function() {
+                const action = $(this).data('action');
+                const cartId = $(this).data('cart-id');
+                const input = $(`.quantity-input[data-cart-id="${cartId}"]`);
+                let quantity = parseInt(input.val());
+                const maxQuantity = parseInt(input.attr('max')) || 999;
+
+                if (action === 'increase' && quantity < maxQuantity) {
+                    quantity++;
+                } else if (action === 'decrease' && quantity > 1) {
+                    quantity--;
+                }
+
+                input.val(quantity);
+                updateQuantity(cartId, quantity);
+            });
+
+            // 數量輸入框變更
+            $('.quantity-input').change(function() {
+                const cartId = $(this).data('cart-id');
+                const quantity = parseInt($(this).val());
+                const maxQuantity = parseInt($(this).attr('max')) || 999;
+
+                if (quantity > maxQuantity) {
+                    $(this).val(maxQuantity);
+                    updateQuantity(cartId, maxQuantity);
+                } else if (quantity < 1) {
+                    $(this).val(1);
+                    updateQuantity(cartId, 1);
+                } else {
+                    updateQuantity(cartId, quantity);
+                }
+            });
+
+            // 移除商品
+            $('.remove-btn').click(function() {
+                const cartId = $(this).data('cart-id');
+                if (confirm('確定要移除此商品嗎？')) {
+                    removeItem(cartId);
+                }
+            });
+        });
+
+        // 更新數量
+        function updateQuantity(cartId, quantity) {
+            $.ajax({
+                url: '/Cart/UpdateQuantity',
+                type: 'POST',
+                data: { cartItemId: cartId, quantity: quantity },
+                success: function(response) {
+                    if (response.success) {
+                        updateCartDisplay();
+                        if (window.refreshCartCount) {
+                            window.refreshCartCount();
+                        }
+                    } else {
+                        alert('更新失敗：' + response.message);
+                        location.reload();
+                    }
+                },
+                error: function() {
+                    alert('系統錯誤，請稍後再試');
+                }
+            });
+        }
+
+        // 移除商品
+        function removeItem(cartId) {
+            $.ajax({
+                url: '/Cart/RemoveItem',
+                type: 'POST',
+                data: { cartItemId: cartId },
+                success: function(response) {
+                    if (response.success) {
+                        $(`.cart-item[data-cart-id="${cartId}"]`).fadeOut(300, function() {
+                            $(this).remove();
+                            updateCartDisplay();
+                            if (window.refreshCartCount) {
+                                window.refreshCartCount();
+                            }
+
+                            // 如果購物車空了，重新載入頁面
+                            if ($('.cart-item').length === 0) {
+                                location.reload();
+                            }
+                        });
+                    } else {
+                        alert('移除失敗：' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('系統錯誤，請稍後再試');
+                }
+            });
+        }
+
+        // 清空購物車
+        function clearCart() {
+            if (confirm('確定要清空整個購物車嗎？')) {
+                $.ajax({
+                    url: '/Cart/ClearCart',
+                    type: 'POST',
+                    success: function(response) {
+                        if (response.success) {
+                            location.reload();
+                        } else {
+                            alert('清空失敗：' + response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('系統錯誤，請稍後再試');
+                    }
+                });
+            }
+        }
+
+        // 更新購物車顯示
+        function updateCartDisplay() {
+            let totalItems = 0;
+            let subtotal = 0;
+
+            $('.cart-item').each(function() {
+                const cartId = $(this).data('cart-id');
+                const quantity = parseInt($(`.quantity-input[data-cart-id="${cartId}"]`).val());
+                const price = parseFloat($(`.quantity-input[data-cart-id="${cartId}"]`).data('price'));
+                const itemTotal = quantity * price;
+
+                // 更新小計
+                $(`.subtotal[data-cart-id="${cartId}"]`).text('$' + itemTotal.toLocaleString());
+
+                totalItems += quantity;
+                subtotal += itemTotal;
+            });
+
+            // 更新總計
+            $('#total-items').text(totalItems + ' 件');
+            $('#subtotal').text('$' + subtotal.toLocaleString());
+
+            // 計算運費
+            const shipping = subtotal >= 1000 ? 0 : 100;
+            $('#shipping').html(shipping === 0 ? '<span class="text-success">免費</span>' : '$100');
+
+            // 更新總金額
+            const total = subtotal + shipping;
+            $('#total-amount').text('$' + total.toLocaleString());
+        }
+
+        // 儲存為最愛
+        function saveForLater() {
+            alert('此功能開發中...');
+        }
+    </script>
+}
+
+<style>
+    .cart-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .quantity-input::-webkit-outer-spin-button,
+    .quantity-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .quantity-input[type=number] {
+        -moz-appearance: textfield;
+    }
+</style>

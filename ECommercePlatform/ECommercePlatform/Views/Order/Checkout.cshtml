@@ -1,0 +1,18 @@
+
+<h2>結帳</h2>
+
+<form method="post">
+    <div class="form-group">
+        <label>收件地址</label>
+        <input type="text" name="address" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label>付款方式</label>
+        <select name="paymentMethod" class="form-control" required>
+            <option value="信用卡">信用卡</option>
+            <option value="貨到付款">貨到付款</option>
+            <option value="Line Pay">Line Pay</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success mt-3">送出訂單</button>
+</form>

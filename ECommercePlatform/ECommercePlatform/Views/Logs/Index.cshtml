@@ -1,0 +1,29 @@
+@model IEnumerable<ECommercePlatform.Models.OperationLog>
+
+<h2>操作日誌紀錄</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>時間</th>
+            <th>工程師</th>
+            <th>控制器</th>
+            <th>動作</th>
+            <th>目標 ID</th>
+            <th>說明</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var log in Model)
+    {
+        <tr>
+            <td>@log.ActionTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</td>
+            <td>@log.Engineer</td>
+            <td>@log.Controller</td>
+            <td>@log.Action</td>
+            <td>@log.TargetId</td>
+            <td>@log.Description</td>
+        </tr>
+    }
+    </tbody>
+</table>

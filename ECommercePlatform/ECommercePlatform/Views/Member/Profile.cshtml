@@ -1,0 +1,53 @@
+@model ECommercePlatform.Models.FixProfile;
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card mt-5">
+                <div class="card-header">
+                    <h2 class="mb-0 text-center">編輯個人資料</h2>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Message == "資料更新成功")
+                    {
+                        <div class="alert alert-info">@ViewBag.Message</div>
+                    }
+                    else if (ViewBag.Message != null)
+                    {
+                        <div class="alert alert-danger">@ViewBag.Message</div>
+                    }
+                    
+                    <form method="post" asp-controller="Member" asp-action="Profile">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            <label class="form-label">您的姓氏：<span class="text-danger">*</span></label>
+                            @Html.TextBoxFor(m => m.LastName, new { @class = "form-control", placeholder = "請輸入姓氏", name = "LastName" })
+                            <span style="color: #C83C23;">@Html.ValidationMessageFor(model => model.LastName)</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">您的名字：<span class="text-danger">*</span></label>
+                            @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control", placeholder = "請輸入名字", name = "FirstName" })
+                            <span style="color: #C83C23;">@Html.ValidationMessageFor(model => model.FirstName)</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">電話：<span class="text-danger">*</span></label>
+                            @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", placeholder = "請輸入電話", name = "PhoneNumber" })
+                            <span style="color: #C83C23;">@Html.ValidationMessageFor(model => model.PhoneNumber)</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">地址：</label>
+                            @Html.TextBoxFor(m => m.Address, new { @class = "form-control", placeholder = "請輸入地址", name = "Address" })
+                            <span style="color: #C83C23;">@Html.ValidationMessageFor(model => model.Address)</span>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100">更新資料</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

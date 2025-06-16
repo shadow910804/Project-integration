@@ -1,0 +1,76 @@
+@{
+    ViewData["Title"] = "管理後台";
+}
+
+<div class="container-fluid">
+    <h1>🛠️ 管理後台儀表板</h1>
+
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5>👥 總用戶數</h5>
+                    <h2>@ViewBag.TotalUsers</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5>📦 總訂單數</h5>
+                    <h2>@ViewBag.TotalOrders</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5>🛍️ 總商品數</h5>
+                    <h2>@ViewBag.TotalProducts</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5>⚙️ 系統狀態</h5>
+                    <h2>正常</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>🔗 快速連結</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <a href="/admin/orders" class="btn btn-outline-primary btn-block mb-2">📋 訂單管理</a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="/admin/users" class="btn btn-outline-success btn-block mb-2">👥 用戶管理</a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="/admin/reviews" class="btn btn-outline-info btn-block mb-2">💬 評價管理</a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <a href="/admin/logs" class="btn btn-outline-secondary btn-block mb-2">📊 操作日誌</a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="/admin/push" class="btn btn-outline-warning btn-block mb-2">🔔 推播通知</a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="/Engineer/Logout" class="btn btn-outline-danger btn-block mb-2">🚪 登出</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

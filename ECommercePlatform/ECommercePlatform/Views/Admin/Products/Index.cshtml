@@ -1,0 +1,34 @@
+@model ECommercePlatform.Models.ViewModels.PagedResult<ECommercePlatform.Models.Product>
+
+<h2>商品管理</h2>
+<a class="btn btn-primary mb-3" href="/admin/products/create">新增商品</a>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>名稱</th>
+            <th>價格</th>
+            <th>圖片</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var p in Model.Items)
+    {
+        <tr>
+            <td>@p.Name</td>
+            <td>@p.Price.ToString("C")</td>
+            <td><img src="@p.ImageUrl" width="80" /></td>
+            <td>
+                <a class="btn btn-sm btn-warning" href="/admin/products/edit/@p.Id">編輯</a>
+                <a class="btn btn-sm btn-danger" href="/admin/products/delete/@p.Id" onclick="return confirm('確定要刪除嗎？')">刪除</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@{
+    ViewBag.RouteValues = new Dictionary<string, object>{};
+}
+<partial name="_Pagination" model="Model" />

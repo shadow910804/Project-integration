@@ -1,0 +1,23 @@
+﻿@model IEnumerable<dynamic>
+
+<h2>銷售統計</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>日期</th>
+            <th>銷售金額</th>
+            <th>訂單數量</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var data in Model)
+        {
+            <tr>
+                <td>@data.Date.ToShortDateString()</td>
+                <td>@data.TotalSales</td>
+                <td>@data.OrderCount</td>
+            </tr>
+        }
+    </tbody>
+</table>

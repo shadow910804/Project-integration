@@ -1,0 +1,43 @@
+@{
+    ViewData["Title"] = "用戶登入";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">🔐 用戶登入</h2>
+            </div>
+            <div class="card-body">
+                @if (ViewBag.Message != null)
+                {
+                    <div class="alert alert-danger">@ViewBag.Message</div>
+                }
+
+                <form method="post" asp-controller="Account" asp-action="Login">
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+
+                    <div class="mb-3">
+                        <label class="form-label">帳號：</label>
+                        <input type="text" name="username" class="form-control" placeholder="請輸入帳號" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">密碼：</label>
+                        <input type="password" name="password" class="form-control" placeholder="請輸入密碼" required />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">登入</button>
+                </form>
+
+                <hr />
+
+                <div class="text-center">
+                    <p>還沒有帳號？ <a asp-controller="Account" asp-action="Register">立即註冊</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

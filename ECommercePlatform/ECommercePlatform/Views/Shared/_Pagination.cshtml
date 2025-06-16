@@ -1,0 +1,28 @@
+@model dynamic
+@{
+    var routeValues = (ViewBag.RouteValues as IDictionary<string, object>)?
+    .ToDictionary(kv => kv.Key, kv => kv.Value?.ToString() ?? "")
+    ?? new Dictionary<string, string>();
+}
+
+@if (Model.TotalPages > 1)
+{
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                <a class="page-link" asp-all-route-data="routeValues" asp-route-page="@(Model.PageNumber - 1)">上一頁</a>
+            </li>
+
+            @for (var i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(Model.PageNumber == i ? "active" : "")">
+                    <a class="page-link" asp-all-route-data="routeValues" asp-route-page="@i">@i</a>
+                </li>
+            }
+
+            <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                <a class="page-link" asp-all-route-data="routeValues" asp-route-page="@(Model.PageNumber + 1)">下一頁</a>
+            </li>
+        </ul>
+    </nav>
+}

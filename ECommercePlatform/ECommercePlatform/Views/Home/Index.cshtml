@@ -1,0 +1,327 @@
+﻿@model IEnumerable<ECommercePlatform.Models.Product>
+
+@{
+    ViewData["Title"] = "首頁總覽";
+}
+
+<div class="hero-section text-center py-5 mb-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px;">
+    <h1 class="display-4 fw-bold">🛒Ez購,Ez Life</h1>
+    <p class="lead">精選優質商品，讓購物變得簡單快樂！</p>
+    <a asp-controller="Product" asp-action="Index" class="btn btn-light btn-lg mt-3">
+        <i class="fas fa-shopping-bag"></i> 瀏覽所有商品
+    </a>
+</div>
+
+<!-- 快捷導航 -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+                <h5 class="card-title">📱 最新商品</h5>
+                <a asp-controller="Product" asp-action="Index" asp-route-sort="newest" class="btn btn-outline-primary">查看</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+                <h5 class="card-title">🔥 熱銷商品</h5>
+                <a asp-controller="Product" asp-action="Index" asp-route-sort="popular" class="btn btn-outline-danger">查看</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+                <h5 class="card-title">💰 特價商品</h5>
+                <a asp-controller="Product" asp-action="Index" asp-route-sort="price" class="btn btn-outline-success">查看</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+                <h5 class="card-title">⭐ 推薦商品</h5>
+                <a asp-controller="Product" asp-action="Index" asp-route-sort="recommended" class="btn btn-outline-warning">查看</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>🔥 精選商品</h2>
+        <a asp-controller="Product" asp-action="Index" class="btn btn-outline-primary">查看全部 →</a>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row">
+            @foreach (var product in Model.Where(p => p.IsActive).Take(8))
+            {
+                <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                    <div class="card h-100 shadow-sm product-card">
+                        <!-- 商品圖片 -->
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center position-relative"
+                             style="height: 200px; cursor: pointer;"
+                             onclick="window.location.href='@Url.Action("Details", "Product", new { id = product.Id })'">
+
+                            <!-- 折扣標籤 -->
+                            @if (product.HasDiscount)
+                            {
+                                var discountPercent = Math.Round((1 - (product.DiscountPrice!.Value / product.Price)) * 100);
+                                <div class="position-absolute top-0 start-0 bg-danger text-white px-2 py-1 small rounded-end">
+                                    -@discountPercent%
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrEmpty(product.ImageUrl))
+                            {
+                                <img src="@product.ImageUrl" alt="@product.Name"
+                                     style="max-height: 180px; max-width: 100%; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <div class="text-muted" style="font-size: 3rem;">📱</div>
+                            }
+                        </div>
+
+                        <div class="card-body d-flex flex-column">
+                            <!-- 商品名稱 -->
+                            <h5 class="card-title" style="font-size: 1.1rem; line-height: 1.3; height: 2.6rem; overflow: hidden;">
+                                <a asp-controller="Product" asp-action="Details" asp-route-id="@product.Id"
+                                   class="text-decoration-none text-dark">
+                                    @product.Name
+                                </a>
+                            </h5>
+
+                            <!-- 商品描述 -->
+                            <p class="card-text text-muted small" style="height: 3rem; overflow: hidden;">
+                                @(product.Description?.Length > 60 ? product.Description.Substring(0, 60) + "..." : product.Description)
+                            </p>
+
+                            <!-- 價格和評分 -->
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        @if (product.HasDiscount)
+                                        {
+                                            <!-- 有折扣價 -->
+                                            <span class="h5 text-danger mb-0">$@product.CurrentPrice.ToString("N0")</span>
+                                            <small class="text-muted ms-2">
+                                                <del>$@product.Price.ToString("N0")</del>
+                                            </small>
+                                        }
+                                        else
+                                        {
+                                            <!-- 一般價格 -->
+                                            <span class="h5 text-primary mb-0">$@product.CurrentPrice.ToString("N0")</span>
+                                        }
+                                    </div>
+
+                                    <!-- 顯示評分（如果有） -->
+                                    @if (product.AverageRating.HasValue)
+                                    {
+                                        <small class="text-warning">
+                                            ⭐ @product.AverageRating.Value.ToString("F1")
+                                        </small>
+                                    }
+                                </div>
+
+                                <!-- 按鈕區域 -->
+                                <div class="d-grid gap-2">
+                                    <!-- 檢查庫存（如果產品模型有 Stock 屬性） -->
+                                    @{
+                                        try
+                                        {
+                                            var stockValue = (int?)product.GetType().GetProperty("Stock")?.GetValue(product) ?? 999;
+                                            if (stockValue > 0)
+                                            {
+                                                <button class="btn btn-primary btn-sm add-to-cart-btn"
+                                                        data-product-id="@product.Id"
+                                                        data-product-name="@product.Name">
+                                                    <i class="fas fa-cart-plus"></i> 加入購物車
+                                                </button>
+
+                                                if (stockValue <= 5)
+                                                {
+                                                    <small class="text-warning d-block mt-1">⚠️ 僅剩 @stockValue 件</small>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <button class="btn btn-secondary btn-sm" disabled>
+                                                    <i class="fas fa-times"></i> 已售完
+                                                </button>
+                                            }
+                                        }
+                                        catch
+                                        {
+                                            <!-- 如果沒有 Stock 屬性，預設為有庫存 -->
+                                            <button class="btn btn-primary btn-sm add-to-cart-btn"
+                                                    data-product-id="@product.Id"
+                                                    data-product-name="@product.Name">
+                                                <i class="fas fa-cart-plus"></i> 加入購物車
+                                            </button>
+                                        }
+                                    }
+
+                                    <a asp-controller="Product" asp-action="Details" asp-route-id="@product.Id"
+                                       class="btn btn-outline-secondary btn-sm">
+                                        查看詳情
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <div class="mb-3" style="font-size: 4rem;">📦</div>
+            <h3 class="text-muted">目前沒有可顯示的商品</h3>
+            <p class="text-muted">請稍後再來查看，或聯繫管理員添加商品。</p>
+        </div>
+    }
+</section>
+
+<!-- 載入中提示 -->
+<div id="loading-overlay" class="position-fixed top-0 start-0 w-100 h-100 d-none"
+     style="background: rgba(0,0,0,0.5); z-index: 9999;">
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">載入中...</span>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // 加入購物車功能
+        document.addEventListener('DOMContentLoaded', function() {
+            // 所有「加入購物車」按鈕
+            const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const productId = this.getAttribute('data-product-id');
+                    const productName = this.getAttribute('data-product-name');
+
+                    // 防止重複點擊
+                    this.disabled = true;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 加入中...';
+
+                    // 發送加入購物車請求
+                    fetch('/Cart/AddToCart', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                        },
+                        body: JSON.stringify({
+                            productId: parseInt(productId),
+                            quantity: 1
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // 成功提示
+                            this.innerHTML = '<i class="fas fa-check"></i> 已加入';
+                            this.classList.remove('btn-primary');
+                            this.classList.add('btn-success');
+
+                            // 更新購物車數量
+                            if (window.refreshCartCount) {
+                                window.refreshCartCount();
+                            }
+
+                            // 顯示成功訊息
+                            showMessage(`✅ ${productName} 已成功加入購物車！`, 'success');
+
+                            // 2秒後恢復按鈕
+                            setTimeout(() => {
+                                this.innerHTML = '<i class="fas fa-cart-plus"></i> 加入購物車';
+                                this.classList.remove('btn-success');
+                                this.classList.add('btn-primary');
+                                this.disabled = false;
+                            }, 2000);
+
+                        } else {
+                            throw new Error(data.message || '加入購物車失敗');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('加入購物車錯誤:', error);
+
+                        // 如果是未登入，導向登入頁面
+                        if (error.message.includes('登入')) {
+                            showMessage('請先登入會員', 'warning');
+                            setTimeout(() => {
+                                window.location.href = '/Account/Login';
+                            }, 1500);
+                        } else {
+                            showMessage(`❌ ${error.message || '加入購物車失敗，請稍後再試'}`, 'error');
+                        }
+
+                        // 恢復按鈕
+                        this.innerHTML = '<i class="fas fa-cart-plus"></i> 加入購物車';
+                        this.disabled = false;
+                    });
+                });
+            });
+        });
+
+        // 顯示訊息
+        function showMessage(message, type = 'info') {
+            // 創建通知元素
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'danger'} alert-dismissible position-fixed`;
+            alert.style.cssText = 'top: 20px; right: 20px; z-index: 10000; min-width: 300px;';
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            document.body.appendChild(alert);
+
+            // 3秒後自動消失
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.parentNode.removeChild(alert);
+                }
+            }, 3000);
+        }
+
+        // 產品卡片懸停效果
+        document.querySelectorAll('.product-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+                this.style.transition = 'transform 0.3s ease';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+}
+
+<style>
+    .product-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .product-card:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+    .hero-section {
+        background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23ffffff" opacity="0.1"><path d="M0,20 Q250,80 500,50 T1000,30 L1000,100 L0,100 Z"></path></svg>');
+        background-size: cover;
+        background-position: bottom;
+    }
+</style>

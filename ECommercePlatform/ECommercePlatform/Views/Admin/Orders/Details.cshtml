@@ -1,0 +1,33 @@
+@model dynamic
+
+<h2>訂單詳情 - @Model.Id</h2>
+
+<p><strong>用戶：</strong> @Model.User.Username (@Model.User.Email)</p>
+<p><strong>總金額：</strong> @Model.TotalAmount.ToString("C")</p>
+<p><strong>狀態：</strong> @Model.OrderStatus</p>
+<p><strong>付款方式：</strong> @Model.PaymentMethod</p>
+<p><strong>地址：</strong> @Model.ShippingAddress</p>
+<p><strong>建立時間：</strong> @Model.OrderDate.ToString("yyyy-MM-dd HH:mm")</p>
+
+<h4>訂單項目</h4>
+<table class="table">
+    <thead>
+        <tr>
+            <th>商品</th>
+            <th>數量</th>
+            <th>單價</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.Items)
+    {
+        <tr>
+            <td>@item.ProductName</td>
+            <td>@item.Quantity</td>
+            <td>@item.UnitPrice.ToString("C")</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<a class="btn btn-secondary" href="/admin/orders">返回</a>

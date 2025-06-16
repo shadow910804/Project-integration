@@ -1,0 +1,27 @@
+@model IEnumerable<ECommercePlatform.Models.Engineer>
+
+<h2>工程師帳號管理</h2>
+<a class="btn btn-primary mb-3" href="/admin/engineers/create">新增帳號</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>帳號</th>
+            <th>Email</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var e in Model)
+    {
+        <tr>
+            <td>@e.Username</td>
+            <td>@e.Email</td>
+            <td>
+                <a class="btn btn-sm btn-warning" href="/admin/engineers/edit/@e.Id">編輯</a>
+                <a class="btn btn-sm btn-danger" href="/admin/engineers/delete/@e.Id" onclick="return confirm('確定要刪除嗎？')">刪除</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

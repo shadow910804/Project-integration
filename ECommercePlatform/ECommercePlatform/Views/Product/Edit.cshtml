@@ -1,0 +1,49 @@
+@model ECommercePlatform.Models.Product
+
+@{
+    ViewData["Title"] = "編輯商品";
+}
+
+<h2>編輯商品</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="Name">名稱</label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Description">描述</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Price">價格</label>
+        <input asp-for="Price" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ImageUrl">圖片網址</label>
+        <input asp-for="ImageUrl" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="DiscountPrice">折扣價格</label>
+        <input asp-for="DiscountPrice" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="DiscountStart">折扣開始時間</label>
+        <input asp-for="DiscountStart" type="datetime-local" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="DiscountEnd">折扣結束時間</label>
+        <input asp-for="DiscountEnd" type="datetime-local" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-success mt-3">儲存</button>
+    <a asp-action="Index" class="btn btn-secondary mt-3">返回列表</a>
+</form>

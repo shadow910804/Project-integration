@@ -1,0 +1,280 @@
+﻿@model ECommercePlatform.Models.Product
+
+@{
+    ViewData["Title"] = Model.Name;
+    var stockStatus = ViewBag.StockStatus as ECommercePlatform.Services.InventoryCheckResult;
+    var relatedProducts = ViewBag.RelatedProducts as List<ECommercePlatform.Models.Product>;
+}
+
+<div class="container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">首頁</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Product" asp-action="Index">商品</a></li>
+            <li class="breadcrumb-item active">@Model.Name</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- 商品圖片 -->
+        <div class="col-md-6">
+            <div class="text-center">
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded shadow" style="max-height: 400px;" />
+                }
+                else
+                {
+                    <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 400px;">
+                        <span style="font-size: 5rem;">📱</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- 商品資訊 -->
+        <div class="col-md-6">
+            <h1>@Model.Name</h1>
+
+            <!-- 價格顯示 -->
+            <div class="mb-3">
+                @if (Model.HasDiscount)
+                {
+                    <div class="d-flex align-items-center">
+                        <span class="h3 text-danger me-3">$@Model.CurrentPrice.ToString("N0")</span>
+                        <span class="text-muted text-decoration-line-through">$@Model.Price.ToString("N0")</span>
+                        @{
+                            var discountPercent = Math.Round((1 - (Model.DiscountPrice!.Value / Model.Price)) * 100);
+                        }
+                        <span class="badge bg-danger ms-2">-@discountPercent%</span>
+                    </div>
+                    @if (Model.DiscountEnd.HasValue)
+                    {
+                        <small class="text-muted">特價至：@Model.DiscountEnd.Value.ToString("yyyy/MM/dd HH:mm")</small>
+                    }
+                }
+                else
+                {
+                    <span class="h3 text-primary">$@Model.CurrentPrice.ToString("N0")</span>
+                }
+            </div>
+
+            <!-- 商品描述 -->
+            @if (!string.IsNullOrEmpty(Model.Description))
+            {
+                <div class="mb-3">
+                    <h5>商品描述</h5>
+                    <p>@Model.Description</p>
+                </div>
+            }
+
+            <!-- 庫存狀態 -->
+            <div class="mb-3">
+                @if (stockStatus != null)
+                {
+                    @if (stockStatus.IsAvailable)
+                    {
+                        <span class="badge bg-success">現貨供應</span>
+                        @if (stockStatus.AvailableQuantity <= 5)
+                        {
+                            <span class="text-warning ms-2">⚠️ 僅剩 @stockStatus.AvailableQuantity 件</span>
+                        }
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">暫時缺貨</span>
+                    }
+                }
+            </div>
+
+            <!-- 評分顯示 -->
+            @if (Model.AverageRating.HasValue)
+            {
+                <div class="mb-3">
+                    <span class="text-warning">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            @if (i <= Model.AverageRating.Value)
+                            {
+                                <text>★</text>
+                            }
+                            else
+                            {
+                                <text>☆</text>
+                            }
+                        }
+                    </span>
+                    <span class="ms-2">@Model.AverageRating.Value.ToString("F1")/5</span>
+                    <small class="text-muted">(@Model.Reviews.Count(r => r.IsVisible) 則評價)</small>
+                </div>
+            }
+
+            <!-- 購買操作 -->
+            <div class="mb-4">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    @if (stockStatus?.IsAvailable == true)
+                    {
+                        <form class="d-flex align-items-center mb-3" onsubmit="addToCart(event, @Model.Id, '@Model.Name')">
+                            <label class="me-2">數量：</label>
+                            <input type="number" name="quantity" value="1" min="1"
+                                   max="@(stockStatus.AvailableQuantity)"
+                                   class="form-control me-3" style="width: 80px;" />
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-cart-plus"></i> 加入購物車
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <button class="btn btn-secondary btn-lg" disabled>
+                            <i class="fas fa-times"></i> 暫時缺貨
+                        </button>
+                    }
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-primary">
+                            登入後購買
+                        </a>
+                    </div>
+                }
+            </div>
+
+            <!-- 快速導航 -->
+            <div class="d-grid gap-2 d-md-block">
+                <a asp-controller="Product" asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> 返回商品列表
+                </a>
+                <a href="#reviews" class="btn btn-outline-info">
+                    <i class="fas fa-comments"></i> 查看評價
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 商品評價區域 -->
+    <div id="reviews" class="mt-5">
+        <h3>商品評價</h3>
+        @if (Model.Reviews.Any(r => r.IsVisible))
+        {
+            <div class="row">
+                @foreach (var review in Model.Reviews.Where(r => r.IsVisible).Take(3))
+                {
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <strong>@(review.UserName ?? review.User?.Username ?? "匿名")</strong>
+                                    <span class="text-warning">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            @if (i <= review.Rating)
+                                            {
+                                                <text>★</text>
+                                            }
+                                            else
+                                            {
+                                                <text>☆</text>
+                                            }
+                                        }
+                                    </span>
+                                </div>
+                                <p class="card-text">@review.Content</p>
+                                <small class="text-muted">@review.CreatedAt.ToString("yyyy/MM/dd")</small>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="text-center">
+                <a asp-controller="Review" asp-action="Index" asp-route-productId="@Model.Id"
+                   class="btn btn-outline-primary">查看所有評價</a>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-4">
+                <p class="text-muted">尚無評價，成為第一個評價的人！</p>
+            </div>
+        }
+    </div>
+
+    <!-- 推薦商品 -->
+    @if (relatedProducts != null && relatedProducts.Any())
+    {
+        <div class="mt-5">
+            <h3>您可能也喜歡</h3>
+            <div class="row">
+                @foreach (var relatedProduct in relatedProducts)
+                {
+                    <div class="col-md-3 mb-3">
+                        <div class="card h-100">
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                @if (!string.IsNullOrEmpty(relatedProduct.ImageUrl))
+                                {
+                                    <img src="@relatedProduct.ImageUrl" alt="@relatedProduct.Name"
+                                         style="max-height: 180px; max-width: 100%; object-fit: cover;" />
+                                }
+                                else
+                                {
+                                    <span style="font-size: 3rem;">📱</span>
+                                }
+                            </div>
+                            <div class="card-body">
+                                <h6 class="card-title">@relatedProduct.Name</h6>
+                                <p class="card-text text-primary">$@relatedProduct.CurrentPrice.ToString("N0")</p>
+                                <a asp-controller="Product" asp-action="Details" asp-route-id="@relatedProduct.Id"
+                                   class="btn btn-sm btn-outline-primary">查看詳情</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function addToCart(event, productId, productName) {
+            event.preventDefault();
+
+            const form = event.target;
+            const quantity = parseInt(form.quantity.value);
+
+            if (quantity < 1) {
+                alert('數量必須至少為 1');
+                return;
+            }
+
+            fetch('/Cart/AddToCart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    productId: productId,
+                    quantity: quantity
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`✅ ${productName} 已成功加入購物車！`);
+                    // 更新購物車數量
+                    if (window.refreshCartCount) {
+                        window.refreshCartCount();
+                    }
+                } else {
+                    alert(`❌ ${data.message || '加入購物車失敗'}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('系統錯誤，請稍後再試');
+            });
+        }
+    </script>
+}

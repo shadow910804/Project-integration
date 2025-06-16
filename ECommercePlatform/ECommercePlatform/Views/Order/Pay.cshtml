@@ -1,0 +1,16 @@
+@{
+    ViewData["Title"] = "轉向付款";
+}
+
+<h2>正在導向付款頁面...</h2>
+
+<form id="newebpay-form" method="post" action="https://ccore.newebpay.com/MPG/mpg_gateway">
+    <input type="hidden" name="MerchantID" value="@ViewBag.MerchantID" />
+    <input type="hidden" name="TradeInfo" value="@ViewBag.TradeInfo" />
+    <input type="hidden" name="TradeSha" value="@ViewBag.TradeSha" />
+    <input type="hidden" name="Version" value="@ViewBag.Version" />
+</form>
+
+<script>
+    document.getElementById("newebpay-form").submit();
+</script>

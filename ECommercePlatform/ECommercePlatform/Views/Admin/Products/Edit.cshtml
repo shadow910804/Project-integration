@@ -1,0 +1,27 @@
+@model ECommercePlatform.Models.Product
+
+<h2>編輯商品</h2>
+
+<form method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Id" />
+    <div class="form-group">
+        <label>名稱</label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>描述</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+    <div class="form-group">
+        <label>價格</label>
+        <input asp-for="Price" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>商品圖片</label>
+        <input type="file" name="imageFile" class="form-control mb-2" accept="image/*" />
+        <label>圖片 URL（如無上傳請保留）</label>
+        <input asp-for="ImageUrl" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">更新</button>
+    <a class="btn btn-secondary" href="/admin/products">返回</a>
+</form>
