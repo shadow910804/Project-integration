@@ -12,7 +12,7 @@ namespace ECommercePlatform.Models
         public string NewPassword { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "確認密碼為必填")]
-        [Compare("NewPassword", ErrorMessage = "確認密碼與新密碼不符")]
+        [Compare("NewPassword", ErrorMessage = "確認密碼與新密碼不一致")]
         public string CheckPassword { get; set; } = string.Empty;
     }
 }

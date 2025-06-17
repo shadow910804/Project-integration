@@ -204,7 +204,7 @@
                                                 data-review-id="@review.Id">
                                             <i class="fas "></i> 編輯留言
                                         </button>
-                                        <button class="btn btn-sm btn-outline-secondary delete"
+                                        <button class="btn btn-sm btn-outline-secondary delete-btn"
                                                 data-review-id="@review.Id">
                                             <i class="fas fa-trash"></i> 刪除留言
                                         </button>
@@ -447,7 +447,7 @@
             modal.show();
         }
 
-        // 檢舉功能
+        //初始化(不等圖片、css)
         document.addEventListener('DOMContentLoaded', function() {
             // 檢舉按鈕點擊事件
             document.querySelectorAll('.report-btn').forEach(button => {
@@ -494,6 +494,19 @@
                     alert('❌ 檢舉失敗，請稍後再試');
                 });
             });
+
+
+            // 刪除功能
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const reviewId = this.getAttribute('data-review-id');
+                    let DeleteCheck = confirm("確定刪除留言嗎?");
+                        alert(reviewId);
+                });
+            });
+
+
+
 
             // 有幫助按鈕
             document.querySelectorAll('.helpful-btn').forEach(button => {

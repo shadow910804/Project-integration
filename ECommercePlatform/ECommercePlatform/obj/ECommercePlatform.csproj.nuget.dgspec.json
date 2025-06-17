@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\USER\\Desktop\\ECommercePlatform\\ECommercePlatform\\ECommercePlatform.csproj": {}
+    "C:\\Users\\USER\\Desktop\\update\\ECommercePlatform\\ECommercePlatform\\ECommercePlatform.csproj": {}
   },
   "projects": {
-    "C:\\Users\\USER\\Desktop\\ECommercePlatform\\ECommercePlatform\\ECommercePlatform.csproj": {
+    "C:\\Users\\USER\\Desktop\\update\\ECommercePlatform\\ECommercePlatform\\ECommercePlatform.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\USER\\Desktop\\ECommercePlatform\\ECommercePlatform\\ECommercePlatform.csproj",
+        "projectUniqueName": "C:\\Users\\USER\\Desktop\\update\\ECommercePlatform\\ECommercePlatform\\ECommercePlatform.csproj",
         "projectName": "ECommercePlatform",
-        "projectPath": "C:\\Users\\USER\\Desktop\\ECommercePlatform\\ECommercePlatform\\ECommercePlatform.csproj",
+        "projectPath": "C:\\Users\\USER\\Desktop\\update\\ECommercePlatform\\ECommercePlatform\\ECommercePlatform.csproj",
         "packagesPath": "C:\\Users\\USER\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\USER\\Desktop\\ECommercePlatform\\ECommercePlatform\\obj\\",
+        "outputPath": "C:\\Users\\USER\\Desktop\\update\\ECommercePlatform\\ECommercePlatform\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

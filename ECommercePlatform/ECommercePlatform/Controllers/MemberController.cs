@@ -76,7 +76,10 @@ namespace ECommercePlatform.Controllers
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
             user.PhoneNumber = model.PhoneNumber;
-            user.Address = model.Address;
+            if (model.Address != null)
+            {
+                user.Address = model.Address;
+            }
 
             try
             {
@@ -91,7 +94,7 @@ namespace ECommercePlatform.Controllers
                 _log.Log("Account", "UpdateProfileError", userId.ToString(), ex.Message);
             }
 
-            return View(user);
+            return View();
         }
 
         [HttpGet]
@@ -127,7 +130,7 @@ namespace ECommercePlatform.Controllers
 
                 await _context.SaveChangesAsync();
                 _log.Log("Account", "UpdatePassword", user.Id.ToString(), "更新密碼");
-                ViewBag.Message = "資料更新成功";
+                ViewBag.Message = "密碼更新成功";
                 ViewBag.Success = true;
 
             }
