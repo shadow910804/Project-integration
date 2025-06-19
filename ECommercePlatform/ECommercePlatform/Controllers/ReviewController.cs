@@ -31,6 +31,10 @@ namespace ECommercePlatform.Controllers
         {
             try
             {
+                if (TempData["ReviewResult"]!=null)
+                {
+                    ViewBag.ReviewResult = TempData["ReviewResult"];
+                }
                 var query = _context.Reviews
                     .Include(r => r.User)
                     .Include(r => r.Product)
@@ -111,6 +115,7 @@ namespace ECommercePlatform.Controllers
                 {
                     var userId = int.Parse(User.Claims.First(c => c.Type == "UserId").Value);
                     ViewBag.PurchasedProducts = await GetPurchasedProductsForReview(userId);
+                    ViewBag.userId=userId;
                 }
 
                 // 支援 AJAX 請求
@@ -136,15 +141,6 @@ namespace ECommercePlatform.Controllers
         {
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    var errors = ModelState.Values
-                        .SelectMany(v => v.Errors)
-                        .Select(e => e.ErrorMessage)
-                        .ToList();
-                    return Json(new { success = false, message = "輸入資料有誤", errors = errors });
-                }
-
                 var userId = int.Parse(User.Claims.First(c => c.Type == "UserId").Value);
                 var userName = User.Identity?.Name ?? "";
 
@@ -311,13 +307,15 @@ namespace ECommercePlatform.Controllers
                 var review = await _context.Reviews.FindAsync(reviewId);
                 if (review == null)
                 {
-                    return Json(new { success = false, message = "評價不存在" });
+                    TempData["ReviewResult"] = "評價不存在";
+                    return RedirectToAction("Index", "Review");
                 }
 
                 // 檢查權限：評價者本人或管理員
                 if (review.UserId != userId && userRole != "Admin" && userRole != "Engineer")
                 {
-                    return Json(new { success = false, message = "無權限刪除此評價" });
+                    TempData["ReviewResult"] = "無權限刪除此評價";
+                    return RedirectToAction("Index", "Review");
                 }
 
                 _context.Reviews.Remove(review);
@@ -325,12 +323,14 @@ namespace ECommercePlatform.Controllers
 
                 _log.Log("Review", "Delete", reviewId.ToString(), "刪除評價");
 
-                return Json(new { success = true, message = "評價已刪除" });
+                TempData["ReviewResult"] = "評價成功刪除";
+                return RedirectToAction("Index", "Review");
             }
             catch (Exception ex)
             {
                 _log.Log("Review", "DeleteError", reviewId.ToString(), ex.Message);
-                return Json(new { success = false, message = "刪除評價失敗" });
+                TempData["ReviewResult"] = "刪除評價失敗";
+                return RedirectToAction("Index", "Review");
             }
         }
 

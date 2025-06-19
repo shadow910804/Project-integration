@@ -126,6 +126,20 @@
     </div>
 
     <!-- 評價列表 -->
+    @if(ViewBag.ReviewResult == "評價成功刪除")
+        {
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="alert alert-info">@ViewBag.ReviewResult</div>
+                    </div>
+                </div>
+            </div>
+        }
+    else if (ViewBag.ReviewResult != null)
+        {
+            <div class="alert alert-danger">@ViewBag.ReviewResult</div>
+        }
     <div class="row" id="reviewsList">
         @if (Model.Reviews != null && Model.Reviews.Any())
         {
@@ -198,16 +212,19 @@
                                             <i class="fas fa-flag"></i> 檢舉
                                         </button>
                                     }
-                                    @if (int.Parse(User.Claims.First(c => c.Type == "UserId").Value)==review.UserId)
+                                    @if (ViewBag.userId==review.UserId)
                                     {
                                         <button class="btn btn-sm btn-outline-primary"
                                                 data-review-id="@review.Id">
                                             <i class="fas "></i> 編輯留言
                                         </button>
-                                        <button class="btn btn-sm btn-outline-secondary delete-btn"
-                                                data-review-id="@review.Id">
-                                            <i class="fas fa-trash"></i> 刪除留言
-                                        </button>
+                                        <form asp-action="Delete" asp-controller="Review" method="post" style="display: inline-block;" onsubmit="return confirm('要刪除留言嗎?');">
+                                            @Html.AntiForgeryToken()
+                                            <button class="btn btn-sm btn-outline-secondary delete-btn"
+                                                    name="reviewId" value="@review.Id">
+                                                <i class="fas fa-trash"></i> 刪除留言
+                                            </button>
+                                        </form>
                                     }
                                 </div>
                                 <small class="text-muted">
@@ -304,7 +321,9 @@
                     <h5 class="modal-title">新增評價</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form id="addReviewForm" enctype="multipart/form-data">
+                <form id="addReviewForm" enctype="multipart/form-data" asp-action="Create" asp-controller="Review" method="post">
+                    @Html.AntiForgeryToken()
+
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">評分：</label>
@@ -319,7 +338,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">評價內容：</label>
-                            <textarea name="content" class="form-control" rows="4" placeholder="請描述您的使用體驗..." required></textarea>
+                            <textarea name="content" class="form-control" rows="4" placeholder="請描述您的使用體驗..." required minlength="10" maxlength="1000"></textarea>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">產品ID：</label>
@@ -327,7 +346,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">上傳圖片（可選）：</label>
-                            <input type="file" name="imageFile" class="form-control" accept="image/*" />
+                            <input type="file" name="imageFile" class="form-control" accept="image" />
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -425,7 +444,6 @@
                 data: formData,
                 processData: false,
                 contentType: false,
-                forceSync:true,
                 success: function(result) {
                     if (result.success) {
                         $('#addReviewModal').modal('hide');
@@ -495,19 +513,6 @@
                 });
             });
 
-
-            // 刪除功能
-            document.querySelectorAll('.delete-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const reviewId = this.getAttribute('data-review-id');
-                    let DeleteCheck = confirm("確定刪除留言嗎?");
-                        alert(reviewId);
-                });
-            });
-
-
-
-
             // 有幫助按鈕
             document.querySelectorAll('.helpful-btn').forEach(button => {
                 button.addEventListener('click', function() {
@@ -561,7 +566,7 @@
             transform: scale(1.05);
         }
 
-    /* 響應式設計 */
+    /* 響應式設計
     @@media (max-width: 768px) {
         .review-actions
 
