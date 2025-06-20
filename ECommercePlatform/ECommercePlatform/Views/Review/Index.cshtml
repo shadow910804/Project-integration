@@ -130,9 +130,7 @@
         {
             <div class="row justify-content-center">
                 <div class="col-md-6">
-                    <div class="card">
-                        <div class="alert alert-info">@ViewBag.ReviewResult</div>
-                    </div>
+                    <div class="alert alert-info">@ViewBag.ReviewResult</div>
                 </div>
             </div>
         }
@@ -214,15 +212,15 @@
                                     }
                                     @if (ViewBag.userId==review.UserId)
                                     {
-                                        <button class="btn btn-sm btn-outline-primary"
-                                                data-review-id="@review.Id">
-                                            <i class="fas "></i> 編輯留言
+                                        <button class="btn btn-sm btn-outline-primary update-btn"
+                                                data-review-id="@review.Id" data-bs-toggle="modal" data-bs-target="#UpdateReviewModal">
+                                            <i class="fas "></i> 編輯評價
                                         </button>
-                                        <form asp-action="Delete" asp-controller="Review" method="post" style="display: inline-block;" onsubmit="return confirm('要刪除留言嗎?');">
+                                        <form asp-action="Delete" asp-controller="Review" method="post" style="display: inline-block;" onsubmit="return confirm('要刪除評價嗎?');">
                                             @Html.AntiForgeryToken()
                                             <button class="btn btn-sm btn-outline-secondary delete-btn"
                                                     name="reviewId" value="@review.Id">
-                                                <i class="fas fa-trash"></i> 刪除留言
+                                                <i class="fas fa-trash"></i> 刪除評價
                                             </button>
                                         </form>
                                     }
@@ -321,13 +319,13 @@
                     <h5 class="modal-title">新增評價</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <form id="addReviewForm" enctype="multipart/form-data" asp-action="Create" asp-controller="Review" method="post">
+                <form id="addReviewForm" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
 
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">評分：</label>
-                            <select name="rating" class="form-select" required>
+                            <select name="Rating" class="form-select" required>
                                 <option value="">請選擇評分</option>
                                 <option value="5">⭐⭐⭐⭐⭐ 非常滿意</option>
                                 <option value="4">⭐⭐⭐⭐☆ 滿意</option>
@@ -338,15 +336,15 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">評價內容：</label>
-                            <textarea name="content" class="form-control" rows="4" placeholder="請描述您的使用體驗..." required minlength="10" maxlength="1000"></textarea>
+                            <textarea name="Content" class="form-control" rows="4" placeholder="請描述您的使用體驗..." required minlength="10" maxlength="1000"></textarea>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">產品ID：</label>
-                            <input type="number" name="productId" class="form-control" value="@(ViewBag.ProductId ?? 1)" required />
+                            <input type="number" name="ProductId" class="form-control" value="@(ViewBag.ProductId ?? 1)" required />
                         </div>
                         <div class="mb-3">
                             <label class="form-label">上傳圖片（可選）：</label>
-                            <input type="file" name="imageFile" class="form-control" accept="image" />
+                            <input type="file" name="ImageFile" class="form-control" accept="image" />
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -401,7 +399,7 @@
                     <div class="mb-3">
                         <label class="form-label">詳細說明：</label>
                         <textarea name="description" class="form-control" rows="3"
-                                  placeholder="請詳細說明檢舉原因..."></textarea>
+                                  placeholder="請詳細說明檢舉原因..." maxlength="500"></textarea>
                     </div>
 
                     <div class="form-check">
@@ -430,6 +428,48 @@
     </div>
 </div>
 
+<!-- 編輯評價-->
+<div class="modal fade" id="UpdateReviewModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">編輯評價</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="UpdateReviewForm" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+
+                    <div class="modal-body">
+                        <input type="hidden" id="UpdateReviewId" name="ReviewId" />
+                        <div class="mb-3">
+                            <label class="form-label">評分：</label>
+                            <select name="Rating" class="form-select" required>
+                                <option value="">請選擇評分</option>
+                                <option value="5">⭐⭐⭐⭐⭐ 非常滿意</option>
+                                <option value="4">⭐⭐⭐⭐☆ 滿意</option>
+                                <option value="3">⭐⭐⭐☆☆ 普通</option>
+                                <option value="2">⭐⭐☆☆☆ 不滿意</option>
+                                <option value="1">⭐☆☆☆☆ 非常不滿意</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">評價內容：</label>
+                            <textarea name="Content" class="form-control" rows="4" placeholder="請描述您的使用體驗..." required minlength="10" maxlength="1000"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">上傳圖片（可選）：</label>
+                            <input type="file" name="ImageFile" class="form-control" accept="image" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-success">提交評價</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 @section Scripts {
     <script>
         // 新增評價
@@ -446,7 +486,7 @@
                 contentType: false,
                 success: function(result) {
                     if (result.success) {
-                        $('#addReviewModal').modal('hide');
+                        $('#UpdateReviewModal').modal('hide');
                         location.reload();
                     } else {
                         alert(result.message || '提交失敗');
@@ -454,6 +494,32 @@
                 },
                 error: function() {
                     alert('提交失敗，請稍後重試');
+                }
+            });
+        });
+
+        // 更新評價
+        $('#UpdateReviewForm').submit(function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            $.ajax({
+                url: '@Url.Action("Update", "Review")',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(result) {
+                    if (result.success) {
+                        $('#addReviewModal').modal('hide');
+                        location.reload();
+                    } else {
+                        alert(result.message || '編輯失敗');
+                    }
+                },
+                error: function() {
+                    alert('編輯失敗，請稍後重試');
                 }
             });
         });
@@ -510,6 +576,14 @@
                 .catch(error => {
                     console.error('檢舉失敗:', error);
                     alert('❌ 檢舉失敗，請稍後再試');
+                });
+            });
+
+            // 編輯按鈕點擊事件
+            document.querySelectorAll('.update-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const reviewId = this.getAttribute('data-review-id');
+                    document.getElementById('UpdateReviewId').value = reviewId;
                 });
             });
 

@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Azure;
+using Azure.Core;
 using ECommercePlatform.Data;
 using ECommercePlatform.Models;
-using ECommercePlatform.Models.ViewModels;
 using ECommercePlatform.Models.DTOs;
+using ECommercePlatform.Models.ViewModels;
 using ECommercePlatform.Services;
-using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using static ECommercePlatform.Models.DTOs.ReviewDTOs;
 
 namespace ECommercePlatform.Controllers
 {
@@ -253,42 +256,63 @@ namespace ECommercePlatform.Controllers
         [HttpPost]
         [Authorize(Roles = "User")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(int reviewId, string content, int rating)
+        public async Task<IActionResult> Update([FromForm] UpdateReviewRequest request)
         {
             try
             {
                 var userId = int.Parse(User.Claims.First(c => c.Type == "UserId").Value);
                 var review = await _context.Reviews
-                    .FirstOrDefaultAsync(r => r.Id == reviewId && r.UserId == userId);
+                    .FirstOrDefaultAsync(r => r.Id == request.ReviewId && r.UserId == userId);
 
                 if (review == null)
                 {
                     return Json(new { success = false, message = "評價不存在或無權限修改" });
                 }
 
-                if (rating < 1 || rating > 5)
+                // 處理圖片上傳（改善驗證）
+                byte[]? imageData = null;
+                string? imageFileName = null;
+                string? imageContentType = null;
+
+                if (request.ImageFile != null && request.ImageFile.Length > 0)
                 {
-                    return Json(new { success = false, message = "評分必須在1-5星之間" });
+                    // 檔案大小限制（5MB）
+                    if (request.ImageFile.Length > 5 * 1024 * 1024)
+                    {
+                        return Json(new { success = false, message = "圖片檔案不能超過 5MB" });
+                    }
+
+                    // 檔案類型驗證
+                    var allowedTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp" };
+                    if (!allowedTypes.Contains(request.ImageFile.ContentType.ToLower()))
+                    {
+                        return Json(new { success = false, message = "只允許上傳 JPG、PNG、GIF、WebP 格式的圖片" });
+                    }
+
+                    // 讀取圖片數據
+                    using var ms = new MemoryStream();
+                    await request.ImageFile.CopyToAsync(ms);
+                    imageData = ms.ToArray();
+                    imageFileName = request.ImageFile.FileName;
+                    imageContentType = request.ImageFile.ContentType;
                 }
 
-                if (string.IsNullOrWhiteSpace(content) || content.Length > 1000)
-                {
-                    return Json(new { success = false, message = "評價內容長度必須在1-1000字之間" });
-                }
-
-                review.Content = content.Trim();
-                review.Rating = rating;
+                review.Content = request.Content.Trim();
+                review.Rating = request.Rating;
                 review.UpdatedAt = DateTime.UtcNow;
+                review.ImageData = imageData;
+                review.ImageFileName = imageFileName;
+                review.ImageContentType = imageContentType;
 
                 await _context.SaveChangesAsync();
 
-                _log.Log("Review", "Update", reviewId.ToString(), "更新評價");
+                _log.Log("Review", "Update", request.ReviewId.ToString(), "更新評價");
 
                 return Json(new { success = true, message = "評價更新成功" });
             }
             catch (Exception ex)
             {
-                _log.Log("Review", "UpdateError", reviewId.ToString(), ex.Message);
+                _log.Log("Review", "UpdateError", request.ReviewId.ToString(), ex.Message);
                 return Json(new { success = false, message = "更新評價失敗" });
             }
         }

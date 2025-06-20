@@ -7,12 +7,20 @@
       "RelativeMoniker": "D:0:0:{B2898D64-F45D-41AB-AFD8-D8D57B5857BF}|ECommercePlatform.csproj|solutionrelative:views\\review\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{B2898D64-F45D-41AB-AFD8-D8D57B5857BF}|ECommercePlatform.csproj|c:\\users\\user\\desktop\\update\\ecommerceplatform\\ecommerceplatform\\controllers\\reviewcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B2898D64-F45D-41AB-AFD8-D8D57B5857BF}|ECommercePlatform.csproj|solutionrelative:controllers\\reviewcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B2898D64-F45D-41AB-AFD8-D8D57B5857BF}|ECommercePlatform.csproj|c:\\users\\user\\desktop\\update\\ecommerceplatform\\ecommerceplatform\\models\\viewmodels\\reviewlistviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B2898D64-F45D-41AB-AFD8-D8D57B5857BF}|ECommercePlatform.csproj|solutionrelative:models\\viewmodels\\reviewlistviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{B2898D64-F45D-41AB-AFD8-D8D57B5857BF}|ECommercePlatform.csproj|c:\\users\\user\\desktop\\update\\ecommerceplatform\\ecommerceplatform\\models\\review.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{B2898D64-F45D-41AB-AFD8-D8D57B5857BF}|ECommercePlatform.csproj|solutionrelative:models\\review.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B2898D64-F45D-41AB-AFD8-D8D57B5857BF}|ECommercePlatform.csproj|c:\\users\\user\\desktop\\update\\ecommerceplatform\\ecommerceplatform\\controllers\\reviewcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B2898D64-F45D-41AB-AFD8-D8D57B5857BF}|ECommercePlatform.csproj|solutionrelative:controllers\\reviewcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B2898D64-F45D-41AB-AFD8-D8D57B5857BF}|ECommercePlatform.csproj|c:\\users\\user\\desktop\\update\\ecommerceplatform\\ecommerceplatform\\models\\dtos\\reviewdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B2898D64-F45D-41AB-AFD8-D8D57B5857BF}|ECommercePlatform.csproj|solutionrelative:models\\dtos\\reviewdtos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{B2898D64-F45D-41AB-AFD8-D8D57B5857BF}|ECommercePlatform.csproj|c:\\users\\user\\desktop\\update\\ecommerceplatform\\ecommerceplatform\\views\\member\\password.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
@@ -26,11 +34,37 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 1,
+              "Title": "ReviewListViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\update\\ECommercePlatform\\ECommercePlatform\\Models\\ViewModels\\ReviewListViewModel.cs",
+              "RelativeDocumentMoniker": "Models\\ViewModels\\ReviewListViewModel.cs",
+              "ToolTip": "C:\\Users\\USER\\Desktop\\update\\ECommercePlatform\\ECommercePlatform\\Models\\ViewModels\\ReviewListViewModel.cs",
+              "RelativeToolTip": "Models\\ViewModels\\ReviewListViewModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-20T06:14:45.395Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ReviewDTOs.cs",
+              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\update\\ECommercePlatform\\ECommercePlatform\\Models\\DTOs\\ReviewDTOs.cs",
+              "RelativeDocumentMoniker": "Models\\DTOs\\ReviewDTOs.cs",
+              "ToolTip": "C:\\Users\\USER\\Desktop\\update\\ECommercePlatform\\ECommercePlatform\\Models\\DTOs\\ReviewDTOs.cs",
+              "RelativeToolTip": "Models\\DTOs\\ReviewDTOs.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAA2wBcAAAA+AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-20T04:59:59.951Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
               "Title": "Password.cshtml",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\update\\ECommercePlatform\\ECommercePlatform\\Views\\Member\\Password.cshtml",
               "RelativeDocumentMoniker": "Views\\Member\\Password.cshtml",
@@ -56,13 +90,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "ReviewController.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\update\\ECommercePlatform\\ECommercePlatform\\Controllers\\ReviewController.cs",
               "RelativeDocumentMoniker": "Controllers\\ReviewController.cs",
               "ToolTip": "C:\\Users\\USER\\Desktop\\update\\ECommercePlatform\\ECommercePlatform\\Controllers\\ReviewController.cs",
               "RelativeToolTip": "Controllers\\ReviewController.cs",
-              "ViewState": "AgIAAIgAAAAAAAAAAAAgwCUBAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAAoAAAAAAAAAAAAYwBYAAAA0AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-06-19T03:44:47.351Z",
               "EditorCaption": ""
@@ -75,7 +109,7 @@
               "RelativeDocumentMoniker": "Views\\Review\\Index.cshtml",
               "ToolTip": "C:\\Users\\USER\\Desktop\\update\\ECommercePlatform\\ECommercePlatform\\Views\\Review\\Index.cshtml",
               "RelativeToolTip": "Views\\Review\\Index.cshtml",
-              "ViewState": "AgIAADICAAAAAAAAAAAAAMsAAABiAAAAAAAAAA==",
+              "ViewState": "AgIAAEABAAAAAAAAAAAAAFYAAAA+AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2025-06-19T03:44:00.518Z",
               "EditorCaption": ""
