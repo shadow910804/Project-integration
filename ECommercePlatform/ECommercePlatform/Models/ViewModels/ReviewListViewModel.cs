@@ -33,5 +33,14 @@ namespace ECommercePlatform.Models.ViewModels
                 );
             }
         }
+
+
+        //產品搜尋列表
+        public List<ProductList> ProductList { get; set; } = new();
+    }
+    public class ProductList
+    {
+        public int ProductId { get; set; }
+        public string ProductName { get; set; } = string.Empty;
     }
 }

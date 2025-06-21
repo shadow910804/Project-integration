@@ -1,5 +1,6 @@
 ﻿using Azure;
 using Azure.Core;
+using DocumentFormat.OpenXml.Wordprocessing;
 using ECommercePlatform.Data;
 using ECommercePlatform.Models;
 using ECommercePlatform.Models.DTOs;
@@ -89,6 +90,18 @@ namespace ECommercePlatform.Controllers
                     .Where(r => r.IsVisible && (!productId.HasValue || r.ProductId == productId.Value))
                     .ToListAsync();
 
+                //新留言用篩選產品
+                var temp = await _context.Products.ToListAsync();
+                var productList = new List<ProductList>();
+                foreach (var p in temp)
+                {
+                    productList.Add(new ProductList
+                    {
+                        ProductId = p.Id,
+                        ProductName = p.Name,
+                    });
+                }
+
                 var result = new ReviewListViewModel
                 {
                     Reviews = reviews,
@@ -100,10 +113,11 @@ namespace ECommercePlatform.Controllers
                     RatingDistribution = allReviews
                         .GroupBy(r => r.Rating)
                         .ToDictionary(g => g.Key, g => g.Count()),
+                    ProductList = productList,
                     // 新增統計
                     RecentReviewsCount = allReviews.Count(r => r.CreatedAt >= DateTime.UtcNow.AddDays(-7)),
                     WithImagesCount = allReviews.Count(r => r.HasImage),
-                    WithAdminReplyCount = allReviews.Count(r => r.HasAdminReply)
+                    WithAdminReplyCount = allReviews.Count(r => r.HasAdminReply),
                 };
 
                 // 保存篩選參數

@@ -339,8 +339,15 @@
                             <textarea name="Content" class="form-control" rows="4" placeholder="請描述您的使用體驗..." required minlength="10" maxlength="1000"></textarea>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">產品ID：</label>
-                            <input type="number" name="ProductId" class="form-control" value="@(ViewBag.ProductId ?? 1)" required />
+                            <label class="form-label" for="product-name-id">產品名稱：</label>
+                            <input list="product-name-id" name="ProductId" value="@(ViewBag.ProductId ?? string.Empty)" placeholder="請輸入商品名稱或商品ID" required/>
+                            <datalist id="product-name-id">
+                                @if (Model.ProductList != null && Model.ProductList.Any()) {
+                                    foreach(var ProductList in Model.ProductList){
+                                        <option value="@ProductList.ProductId">@ProductList.ProductName</option>
+                                    }
+                                }
+                            </datalist>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">上傳圖片（可選）：</label>
